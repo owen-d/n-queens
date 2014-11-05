@@ -79,11 +79,29 @@
     //
     // test if a specific row on this board contains a conflict
     hasRowConflictAt: function(rowIndex) {
+      //test if piece exists with indexOf
+      var row = this.get(rowIndex);
+      var colIndex = row.indexOf(1); //if piece exists, index value; else -1
+      if (colIndex !== -1 && colIndex !== row.length-1 ) {
+        if (row.indexOf(1,colIndex+1) !== -1) {
+          return true;
+        }
+      }
+
+        //using the returned index value; call inedexOf to test if another piece exists in
+          // return true else false
+
       return false; // fixme
     },
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
+      var rows = this.rows();
+      for (i = 0; i < rows.length; i++) {
+        if (this.hasRowConflictAt(i)) {
+          return true;
+        }
+      }
       return false; // fixme
     },
 
@@ -94,11 +112,36 @@
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
+      var found = 0;
+      //check this.rows().length
+      var numRows = this.rows().length;
+      for (var i =0; i < numRows; i++){
+        if (this.get(i)[colIndex] === 1) {
+          found++;
+        }
+        if (found > 1) {
+          return true;
+        }
+      }
+
+      //iterate over that, only checking this.get(i)[colIndex]
+        // if find it then found++
+          //if found >1 return true;
+        //
       return false; // fixme
     },
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
+      var colLength = this.get(0).length;
+      //iterate through all columns
+        //if hasColConflictAt(columnIndex) === true;
+          //return true;
+      for (var i = 0; i < colLength; i++) {
+        if (this.hasColConflictAt(i)) {
+          return true;
+        }
+      }
       return false; // fixme
     },
 
