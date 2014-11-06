@@ -78,6 +78,13 @@
     // --------------------------------------------------------------
     //
     // test if a specific row on this board contains a conflict
+    buildMatrix: function(){
+      var that = this;
+      return _.map(this.rows(), function(array){
+        return array.slice();
+      }, that);
+    },
+
     hasRowConflictAt: function(rowIndex) {
       //test if piece exists with indexOf
       var row = this.get(rowIndex);
@@ -96,8 +103,7 @@
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
-      var rows = this.rows();
-      for (i = 0; i < rows.length; i++) {
+      for (i = 0; i < this.get('n'); i++) {
         if (this.hasRowConflictAt(i)) {
           return true;
         }
@@ -166,7 +172,7 @@
         }
         row++;
         col++;
-        if (row < that.rows().length && col < that.rows().length) {
+        if (row < that.get('n') && col < that.get('n')) {
           return recurse(row,col);
         }
         return false;
@@ -177,8 +183,8 @@
 
     // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
-      var negInd = -(this.rows().length-1);
-      for (var i = negInd; i < this.rows().length; i++) {
+      var negInd = -(this.get('n')-1);
+      for (var i = negInd; i < this.get('n'); i++) {
         if (this.hasMajorDiagonalConflictAt(i)) {
           return true;
         }
@@ -207,7 +213,7 @@
         }
         row++;
         col--;
-        if (row < that.rows().length && col >= 0) {
+        if (row < that.get('n') && col >= 0) {
           return recurse(row,col);
         }
         return false;
@@ -217,8 +223,8 @@
 
     // test if any minor diagonals on this board contain conflicts
     hasAnyMinorDiagonalConflicts: function() {
-      var addNum = this.rows().length-1;
-      for (var i = this.rows().length + addNum; i > 0; i--) {
+      var addNum = this.get('n')-1;
+      for (var i = this.get('n') + addNum; i > 0; i--) {
         if (this.hasMinorDiagonalConflictAt(i)) {
           return true;
         }
