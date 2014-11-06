@@ -114,7 +114,7 @@
     hasColConflictAt: function(colIndex) {
       var found = 0;
       //check this.rows().length
-      var numRows = this.rows().length;
+      var numRows = this.get('n');
       for (var i =0; i < numRows; i++){
         if (this.get(i)[colIndex] === 1) {
           found++;
@@ -133,7 +133,7 @@
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
-      var colLength = this.get(0).length;
+      var colLength = this.get('n');
       //iterate through all columns
         //if hasColConflictAt(columnIndex) === true;
           //return true;
