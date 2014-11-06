@@ -152,8 +152,28 @@
     //
     // test if a specific major diagonal on this board contains a conflict
     hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
-      return false; // fixme
+      var that = this;
+      var count = 0;
+      var rowInd = 0;
+      var colInd = majorDiagonalColumnIndexAtFirstRow;
+
+      var recurse = function(row, col) {
+        if (that.get(row)[col] === 1) {
+          count++;
+          if (count > 1) {
+            return true;
+          }
+        }
+        row++;
+        col++;
+        if (row < that.rows().length && col < that.rows().length) {
+          return recurse(row,col);
+        }
+        return false;
+      };
+      return recurse(rowInd,colInd);
     },
+
 
     // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
