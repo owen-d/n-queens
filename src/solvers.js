@@ -11,19 +11,34 @@
 // take a look at solversSpec.js to see what the tests are expecting
 
 
+
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
+var findFirstRook = function(board, n, v1, rowIndex, callback){
 
-window.findNRooksSolution = function(n) {
-  // debugger;
-  var o = {};
-  o['n'] = n;
-  var board = new Board(o);
-
-  for (var i = 0; i < n ; i++){
-    board.togglePiece(i,i);
+  if (rowIndex === n) {
+    return callback(board);
   }
 
-  var solution = board.rows();
+  for (var i = 0; i < n; i++){
+    board.togglePiece(rowIndex, i);
+    if (!board[v1](i)) {
+      var solution = findFirstRook(board, n, v1, rowIndex + 1, callback);
+      if (solution) {
+        return solution;
+      }
+    }
+    board.togglePiece(rowIndex, i);
+  }
+};
+
+window.findNRooksSolution = function(n) {
+
+  var solution = undefined;
+  var board = new Board({n:n});
+
+  findFirstRook(board,n,'hasColConflictAt',0, function(){
+    return solution = board.rows();
+  });
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
@@ -32,93 +47,97 @@ window.findNRooksSolution = function(n) {
 
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
+var findNRooks = function(board, n, v1, rowIndex, callback) {
+
+  if (rowIndex === n) {
+    callback();
+    return;
+  }
+
+  for (var i = 0; i < n; i++){
+    board.togglePiece(rowIndex, i);
+    if (!board[v1](i)) {
+      findNRooks(board, n, v1, rowIndex + 1, callback);
+    }
+    board.togglePiece(rowIndex, i);
+  }
+};
+
 window.countNRooksSolutions = function(n) {
   var solutionCount = 0;
-  var o = {};
-  o['n'] = n;
-  var brd = new Board(o);
+  var board = new Board({n:n});
 
-  var recurseRow = function(rowIndex){
-    for (var i = 0; i < n; i++){
-      brd.togglePiece(rowIndex, i);
-      if (!brd.hasColConflictAt(i)) {
-        if (rowIndex === n-1) {
-          solutionCount++;
-        } else {
-          recurseRow(rowIndex + 1);
-        }
-      }
-      brd.togglePiece(rowIndex, i);
-    }
-  };
-
-  recurseRow(0);
+  findNRooks(board, n, 'hasColConflictAt', 0, function(){
+    solutionCount++;
+  });
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
 
 
-
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
-window.findNQueensSolution = function(n) {
-  if (n === 0) {return [];}
-  var solution;
-  var o = {};
-  o['n'] = n;
-  var brd = new Board(o);
+var findFirstQueen = function(board, n, v1, v2, v3, rowIndex, callback){
 
-  var recurseRow = function(rowIndex){
-    for (var i = 0; i < n; i++){
-      brd.togglePiece(rowIndex, i);
-      if (!brd.hasColConflictAt(i) && !brd.hasMajorDiagonalConflictAt(brd._getFirstRowColumnIndexForMajorDiagonalOn(rowIndex, i)) && !brd.hasMinorDiagonalConflictAt(brd._getFirstRowColumnIndexForMinorDiagonalOn(rowIndex, i)) ) {
-        if (rowIndex === n-1) {
-          debugger;
-           solution = brd.buildMatrix();
-        } else {
-          recurseRow(rowIndex + 1);
-        }
-      }
-      brd.togglePiece(rowIndex, i);
-    }
-  };
-
-  recurseRow(0);
-
-  if (solution === undefined) {
-    var obj = {};
-    obj['n'] = n;
-    solution = new Board(obj).rows();
+  if (rowIndex === n) {
+    return callback(board);
   }
 
-  return solution;
+  for (var i = 0; i < n; i++){
+    var majorStart = board._getFirstRowColumnIndexForMajorDiagonalOn(rowIndex, i);
+    var minorStart = board._getFirstRowColumnIndexForMinorDiagonalOn(rowIndex, i);
+    board.togglePiece(rowIndex, i);
+    if (!board[v1](i) && !board[v2](majorStart) && !board[v3](minorStart) ) {
+      var solution = findFirstQueen(board, n, v1, v2, v3, rowIndex + 1, callback);
+      if (solution) {
+        return solution;
+      }
+    }
+    board.togglePiece(rowIndex, i);
+  }
+};
+
+window.findNQueensSolution = function(n) {
+  var board = new Board({n:n});
+  var solution = board.rows();
+
+
+  findFirstQueen(board, n,'hasColConflictAt', 'hasMajorDiagonalConflictAt', 'hasMinorDiagonalConflictAt', 0, function(){
+    return solution = board.buildMatrix();
+  });
+
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  return solution;
 };
 
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
-window.countNQueensSolutions = function(n) {
-  if (n === 0) {return 1};
-  var solutionCount = 0;
-  var o = {};
-  o['n'] = n;
-  var brd = new Board(o);
+var findNQueens = function(board, n, v1, v2, v3, rowIndex, callback){
 
-  var recurseRow = function(rowIndex){
-    for (var i = 0; i < n; i++){
-      brd.togglePiece(rowIndex, i);
-      if (!brd.hasColConflictAt(i) && !brd.hasMajorDiagonalConflictAt(brd._getFirstRowColumnIndexForMajorDiagonalOn(rowIndex, i)) && !brd.hasMinorDiagonalConflictAt(brd._getFirstRowColumnIndexForMinorDiagonalOn(rowIndex, i)) ) {
-        if (rowIndex === n-1) {
-          solutionCount++;
-        } else {
-          recurseRow(rowIndex + 1);
-        }
-      }
-      brd.togglePiece(rowIndex, i);
+  if (rowIndex === n) {
+    callback();
+    return;
+  }
+
+  for (var i = 0; i < n; i++){
+    var majorStart = board._getFirstRowColumnIndexForMajorDiagonalOn(rowIndex, i);
+    var minorStart = board._getFirstRowColumnIndexForMinorDiagonalOn(rowIndex, i);
+    board.togglePiece(rowIndex, i);
+    if (!board[v1](i) && !board[v2](majorStart) && !board[v3](minorStart) ) {
+      findNQueens(board, n, v1, v2, v3, rowIndex + 1, callback);
     }
-  };
+    board.togglePiece(rowIndex, i);
+  }
+};
 
-  recurseRow(0);
+
+window.countNQueensSolutions = function(n) {
+  var solutionCount = 0;
+  var board = new Board({n:n});
+
+  findNQueens(board, n, 'hasColConflictAt', 'hasMajorDiagonalConflictAt', 'hasMinorDiagonalConflictAt', 0, function(){
+    solutionCount++;
+  });
 
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
